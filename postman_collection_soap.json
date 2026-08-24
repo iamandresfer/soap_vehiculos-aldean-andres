@@ -1,0 +1,242 @@
+{
+  "info": {
+    "name": "soap-vehiculos - CRUD SOAP",
+    "description": "Colección Postman para probar el servicio SOAP de Categorías y Vehículos. Endpoint base: http://localhost:5057/VehiculoService.svc. IMPORTANTE: los campos de las entidades (Vehiculo) van en el namespace del modelo y en orden alfabético, tal como exige DataContractSerializer.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5057"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Obtener Categorias",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://tempuri.org/IVehiculoService/ObtenerCategorias"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\n  <soap:Body>\n    <tem:ObtenerCategorias />\n  </soap:Body>\n</soap:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"]
+        },
+        "description": "Retorna la lista completa de categorías registradas en la base de datos."
+      }
+    },
+    {
+      "name": "02 - Obtener Vehiculos",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://tempuri.org/IVehiculoService/ObtenerVehiculos"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\n  <soap:Body>\n    <tem:ObtenerVehiculos />\n  </soap:Body>\n</soap:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"]
+        },
+        "description": "Retorna la lista completa de vehículos registrados."
+      }
+    },
+    {
+      "name": "03 - Obtener Vehiculo por ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://tempuri.org/IVehiculoService/ObtenerVehiculo"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\n  <soap:Body>\n    <tem:ObtenerVehiculo>\n      <tem:id>1</tem:id>\n    </tem:ObtenerVehiculo>\n  </soap:Body>\n</soap:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"]
+        },
+        "description": "Retorna un vehículo específico por su ID. Cambia el valor de <tem:id> para buscar otro vehículo."
+      }
+    },
+    {
+      "name": "04 - Agregar Vehiculo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://tempuri.org/IVehiculoService/AgregarVehiculo"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\n  <soap:Body>\n    <tem:AgregarVehiculo>\n      <tem:vehiculo xmlns:a=\"http://schemas.datacontract.org/2004/07/soap_vehiculos.Models\">\n        <a:Anio>2023</a:Anio>\n        <a:Estado>true</a:Estado>\n        <a:IdCategoria>1</a:IdCategoria>\n        <a:IdVehiculo>0</a:IdVehiculo>\n        <a:Marca>Toyota</a:Marca>\n        <a:Modelo>Corolla</a:Modelo>\n        <a:Placa>PIC-1234</a:Placa>\n      </tem:vehiculo>\n    </tem:AgregarVehiculo>\n  </soap:Body>\n</soap:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"]
+        },
+        "description": "Agrega un nuevo vehículo. IdCategoria debe existir (1=Sedan, 2=SUV, 3=Camioneta). IdVehiculo va en 0 y el servicio devuelve el Id generado."
+      }
+    },
+    {
+      "name": "05 - Actualizar Vehiculo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://tempuri.org/IVehiculoService/ActualizarVehiculo"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\n  <soap:Body>\n    <tem:ActualizarVehiculo>\n      <tem:vehiculo xmlns:a=\"http://schemas.datacontract.org/2004/07/soap_vehiculos.Models\">\n        <a:Anio>2024</a:Anio>\n        <a:Estado>true</a:Estado>\n        <a:IdCategoria>2</a:IdCategoria>\n        <a:IdVehiculo>1</a:IdVehiculo>\n        <a:Marca>Toyota</a:Marca>\n        <a:Modelo>Corolla Cross</a:Modelo>\n        <a:Placa>PIC-1234</a:Placa>\n      </tem:vehiculo>\n    </tem:ActualizarVehiculo>\n  </soap:Body>\n</soap:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"]
+        },
+        "description": "Actualiza el vehículo cuyo IdVehiculo va dentro de la entidad. Retorna null si no existe."
+      }
+    },
+    {
+      "name": "06 - Eliminar Vehiculo",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://tempuri.org/IVehiculoService/EliminarVehiculo"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\n  <soap:Body>\n    <tem:EliminarVehiculo>\n      <tem:id>1</tem:id>\n    </tem:EliminarVehiculo>\n  </soap:Body>\n</soap:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"]
+        },
+        "description": "Elimina un vehículo por su ID. Retorna true si se eliminó, false si no existe."
+      }
+    },
+    {
+      "name": "07 - Buscar Vehiculo por Marca",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://tempuri.org/IVehiculoService/ObtenerVehiculoPorMarca"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\n  <soap:Body>\n    <tem:ObtenerVehiculoPorMarca>\n      <tem:marca>Toyota</tem:marca>\n    </tem:ObtenerVehiculoPorMarca>\n  </soap:Body>\n</soap:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"]
+        },
+        "description": "Busca vehículos cuya marca contenga el texto indicado (coincidencia parcial)."
+      }
+    },
+    {
+      "name": "08 - Buscar Vehiculo por Categoria",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml; charset=utf-8"
+          },
+          {
+            "key": "SOAPAction",
+            "value": "http://tempuri.org/IVehiculoService/ObtenerVehiculoPorCategoria"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\n  <soap:Body>\n    <tem:ObtenerVehiculoPorCategoria>\n      <tem:idCategoria>2</tem:idCategoria>\n    </tem:ObtenerVehiculoPorCategoria>\n  </soap:Body>\n</soap:Envelope>"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"]
+        },
+        "description": "Busca vehículos pertenecientes a la categoría indicada por su IdCategoria."
+      }
+    },
+    {
+      "name": "09 - Verificar WSDL",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/VehiculoService.svc?wsdl",
+          "host": ["{{baseUrl}}"],
+          "path": ["VehiculoService.svc"],
+          "query": [
+            {
+              "key": "wsdl",
+              "value": null
+            }
+          ]
+        },
+        "description": "Obtiene el WSDL del servicio SOAP. Útil para verificar que el servicio está corriendo y ver la definición."
+      }
+    }
+  ]
+}

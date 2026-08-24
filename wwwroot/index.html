@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Servicio SOAP - Vehiculos</title>
+  <style>
+    :root {
+      --azul: #1e4e8c;
+      --azul-claro: #eaf1fb;
+      --borde: #d9dee5;
+      --texto: #24292f;
+      --verde: #1a7f37;
+      --rojo: #cf222e;
+      --gris-fondo: #f6f8fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--texto);
+      background: var(--gris-fondo);
+    }
+    header {
+      background: var(--azul);
+      color: #fff;
+      padding: 18px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    header h1 { margin: 0; font-size: 20px; }
+    header a { color: #cfe0ff; font-size: 14px; }
+    main {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .tarjeta {
+      background: #fff;
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .tarjeta h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      color: var(--azul);
+      border-bottom: 2px solid var(--azul-claro);
+      padding-bottom: 8px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--borde); }
+    th { background: var(--azul-claro); color: var(--azul); }
+    tbody tr:hover { background: var(--gris-fondo); }
+    .estado-si { color: var(--verde); font-weight: 600; }
+    .estado-no { color: var(--rojo); font-weight: 600; }
+    .grid-vehiculos {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 800px) { .grid-vehiculos { grid-template-columns: 1fr; } }
+    label { display: block; font-size: 13px; font-weight: 600; margin: 10px 0 4px; }
+    input[type="text"], select {
+      width: 100%;
+      padding: 7px 9px;
+      border: 1px solid var(--borde);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .checkbox-linea { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 14px; }
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 14px;
+      background: var(--azul);
+      color: #fff;
+    }
+    button:hover { filter: brightness(1.1); }
+    button.secundario { background: #57606a; }
+    button.peligro { background: var(--rojo); padding: 4px 10px; font-size: 13px; }
+    button.chico { padding: 4px 10px; font-size: 13px; background: var(--gris-fondo); color: var(--texto); border: 1px solid var(--borde); }
+    .acciones-forma { display: flex; gap: 10px; margin-top: 16px; }
+    .mensaje { font-size: 13px; margin-top: 10px; min-height: 16px; }
+    .mensaje.ok { color: var(--verde); }
+    .mensaje.error { color: var(--rojo); }
+    .busquedas { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 800px) { .busquedas { grid-template-columns: 1fr; } }
+    .linea-busqueda { display: flex; gap: 8px; margin-bottom: 12px; }
+    .linea-busqueda input, .linea-busqueda select { flex: 1; width: auto; }
+    .vacio { color: #57606a; font-style: italic; padding: 10px 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Servicio SOAP - Vehiculos</h1>
+    <nav>
+      <a href="/VehiculoService.svc?wsdl" target="_blank">Ver WSDL</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="tarjeta">
+      <h2>Categorias</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Descripcion</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="tablaCategorias"></tbody>
+      </table>
+    </section>
+
+    <section class="tarjeta">
+      <h2>Vehiculos</h2>
+      <div class="grid-vehiculos">
+        <form id="formaVehiculo">
+          <input type="hidden" id="campoIdVehiculo" value="" />
+          <label for="campoPlaca">Placa</label>
+          <input type="text" id="campoPlaca" required maxlength="20" />
+
+          <label for="campoMarca">Marca</label>
+          <input type="text" id="campoMarca" required maxlength="50" />
+
+          <label for="campoModelo">Modelo</label>
+          <input type="text" id="campoModelo" required maxlength="50" />
+
+          <label for="campoAnio">Anio</label>
+          <input type="text" id="campoAnio" maxlength="4" placeholder="ej. 2023" />
+
+          <label for="selCategoriaVehiculo">Categoria</label>
+          <select id="selCategoriaVehiculo" required></select>
+
+          <div class="checkbox-linea">
+            <input type="checkbox" id="campoEstado" checked />
+            <label for="campoEstado" style="margin:0">Activo</label>
+          </div>
+
+          <div class="acciones-forma">
+            <button type="submit" id="botonGuardar">Agregar</button>
+            <button type="button" class="secundario" id="botonCancelar" hidden>Cancelar</button>
+          </div>
+          <div class="mensaje" id="mensajeForma"></div>
+        </form>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Placa</th>
+              <th>Marca</th>
+              <th>Modelo</th>
+              <th>Anio</th>
+              <th>Categoria</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaVehiculos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tarjeta">
+      <h2>Busquedas</h2>
+      <div class="busquedas">
+        <div>
+          <strong style="font-size:14px">Por marca</strong>
+          <div class="linea-busqueda">
+            <input type="text" id="busquedaMarca" placeholder="ej. Toyota" />
+            <button type="button" id="botonBuscarMarca">Buscar</button>
+          </div>
+          <div id="resultadoMarca"></div>
+        </div>
+        <div>
+          <strong style="font-size:14px">Por categoria</strong>
+          <div class="linea-busqueda">
+            <select id="selCategoriaBusqueda"></select>
+            <button type="button" id="botonBuscarCategoria">Buscar</button>
+          </div>
+          <div id="resultadoCategoria"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/soap-client.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

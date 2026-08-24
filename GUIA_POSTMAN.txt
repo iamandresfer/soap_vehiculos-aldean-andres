@@ -1,0 +1,195 @@
+===============================================================================
+ GUIA POSTMAN - SERVICIO SOAP VEHICULOS
+===============================================================================
+
+Requisito previo: tener la aplicacion corriendo (dotnet run --launch-profile http)
+Puerto: 5057
+
+URL BASE / ENDPOINT
+-------------------------------------------------------------------------------
+http://localhost:5057/VehiculoService.svc
+
+En Postman se usa la variable {{baseUrl}} = http://localhost:5057
+
+WSDL (verificacion rapida, GET):
+http://localhost:5057/VehiculoService.svc?wsdl
+
+IMPORTAR LA COLECCION
+-------------------------------------------------------------------------------
+1. Abrir Postman > Import > File
+2. Seleccionar postman_collection_soap.json (raiz de este proyecto)
+3. La coleccion trae los 9 requests listos con la variable baseUrl definida.
+
+HEADERS COMUNES A TODAS LAS OPERACIONES SOAP
+-------------------------------------------------------------------------------
+Content-Type : text/xml; charset=utf-8
+SOAPAction   : http://tempuri.org/IVehiculoService/<NombreOperacion>
+
+IMPORTANTE SOBRE LOS CUERPOS XML
+-------------------------------------------------------------------------------
+Los campos de la entidad Vehiculo deben:
+  a) ir en el namespace del modelo:
+     xmlns:a="http://schemas.datacontract.org/2004/07/soap_vehiculos.Models"
+     (prefijo a:)
+  b) aparecer en ORDEN ALFABETICO:
+     Anio, Estado, IdCategoria, IdVehiculo, Marca, Modelo, Placa
+
+Si se envian en otro orden o namespace, DataContractSerializer los ignora
+silenciosamente y el servicio inserta/actualiza con valores por defecto.
+
+CATEGORIAS SEMBRADAS EN LA BASE DE DATOS
+-------------------------------------------------------------------------------
+IdCategoria = 1 -> Sedan
+IdCategoria = 2 -> SUV
+IdCategoria = 3 -> Camioneta
+
+VEHICULOS DE PRUEBA INCLUIDOS EN EL SCRIPT SQL
+-------------------------------------------------------------------------------
+PIC-1234  Toyota    Corolla  2023  Sedan      Activo
+MZD-2405  Mazda     CX-5     2024  SUV        Activo
+FRD-2210  Ford      Ranger   2022  Camioneta  Activo
+CHV-2330  Chevrolet Onix     2023  Sedan      Inactivo
+
+===============================================================================
+ OPERACIONES (todos los requests son POST salvo el WSDL)
+===============================================================================
+
+--- 01 OBTENER CATEGORIAS -----------------------------------------------------
+SOAPAction: http://tempuri.org/IVehiculoService/ObtenerCategorias
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+  <soap:Body>
+    <tem:ObtenerCategorias />
+  </soap:Body>
+</soap:Envelope>
+
+Respuesta esperada: <ObtenerCategoriasResponse> con las 3 categorias.
+
+--- 02 OBTENER VEHICULOS ------------------------------------------------------
+SOAPAction: http://tempuri.org/IVehiculoService/ObtenerVehiculos
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+  <soap:Body>
+    <tem:ObtenerVehiculos />
+  </soap:Body>
+</soap:Envelope>
+
+Respuesta esperada: lista de <a:Vehiculo> con todos los registros.
+
+--- 03 OBTENER VEHICULO POR ID ------------------------------------------------
+SOAPAction: http://tempuri.org/IVehiculoService/ObtenerVehiculo
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+  <soap:Body>
+    <tem:ObtenerVehiculo>
+      <tem:id>1</tem:id>
+    </tem:ObtenerVehiculo>
+  </soap:Body>
+</soap:Envelope>
+
+Cambiar <tem:id>. Si no existe retorna resultado vacio (null).
+
+--- 04 AGREGAR VEHICULO -------------------------------------------------------
+SOAPAction: http://tempuri.org/IVehiculoService/AgregarVehiculo
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+  <soap:Body>
+    <tem:AgregarVehiculo>
+      <tem:vehiculo xmlns:a="http://schemas.datacontract.org/2004/07/soap_vehiculos.Models">
+        <a:Anio>2023</a:Anio>
+        <a:Estado>true</a:Estado>
+        <a:IdCategoria>1</a:IdCategoria>
+        <a:IdVehiculo>0</a:IdVehiculo>
+        <a:Marca>Toyota</a:Marca>
+        <a:Modelo>Corolla</a:Modelo>
+        <a:Placa>PIC-1234</a:Placa>
+      </tem:vehiculo>
+    </tem:AgregarVehiculo>
+  </soap:Body>
+</soap:Envelope>
+
+Notas:
+- IdVehiculo va en 0; el servicio devuelve la entidad con el Id generado.
+- IdCategoria debe existir (1, 2 o 3) o se produce una falla de llave foranea.
+
+--- 05 ACTUALIZAR VEHICULO ----------------------------------------------------
+SOAPAction: http://tempuri.org/IVehiculoService/ActualizarVehiculo
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+  <soap:Body>
+    <tem:ActualizarVehiculo>
+      <tem:vehiculo xmlns:a="http://schemas.datacontract.org/2004/07/soap_vehiculos.Models">
+        <a:Anio>2024</a:Anio>
+        <a:Estado>true</a:Estado>
+        <a:IdCategoria>2</a:IdCategoria>
+        <a:IdVehiculo>1</a:IdVehiculo>
+        <a:Marca>Toyota</a:Marca>
+        <a:Modelo>Corolla Cross</a:Modelo>
+        <a:Placa>PIC-1234</a:Placa>
+      </tem:vehiculo>
+    </tem:ActualizarVehiculo>
+  </soap:Body>
+</soap:Envelope>
+
+El IdVehiculo dentro de la entidad indica cual registro actualizar.
+Si no existe, retorna null.
+
+--- 06 ELIMINAR VEHICULO ------------------------------------------------------
+SOAPAction: http://tempuri.org/IVehiculoService/EliminarVehiculo
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+  <soap:Body>
+    <tem:EliminarVehiculo>
+      <tem:id>1</tem:id>
+    </tem:EliminarVehiculo>
+  </soap:Body>
+</soap:Envelope>
+
+Retorna true si elimino, false si el id no existe.
+
+--- 07 BUSCAR POR MARCA -------------------------------------------------------
+SOAPAction: http://tempuri.org/IVehiculoService/ObtenerVehiculoPorMarca
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+  <soap:Body>
+    <tem:ObtenerVehiculoPorMarca>
+      <tem:marca>Toyota</tem:marca>
+    </tem:ObtenerVehiculoPorMarca>
+  </soap:Body>
+</soap:Envelope>
+
+Coincidencia parcial (contiene). Ejemplo: "Toy" tambien encuentra Toyota.
+
+--- 08 BUSCAR POR CATEGORIA ---------------------------------------------------
+SOAPAction: http://tempuri.org/IVehiculoService/ObtenerVehiculoPorCategoria
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+  <soap:Body>
+    <tem:ObtenerVehiculoPorCategoria>
+      <tem:idCategoria>2</tem:idCategoria>
+    </tem:ObtenerVehiculoPorCategoria>
+  </soap:Body>
+</soap:Envelope>
+
+--- 09 VERIFICAR WSDL ---------------------------------------------------------
+GET http://localhost:5057/VehiculoService.svc?wsdl
+Sin body ni headers especiales. Debe devolver el XML del WSDL.
+
+===============================================================================
+ ERRORES COMUNES
+===============================================================================
+
+1) Falla de llave foranea (FK_Vehiculo_Categoria)
+   -> El IdCategoria enviado no existe. Usar 1, 2 o 3 (ver seeds).
+
+2) Los inserts guardan filas vacias o en cero
+   -> Los campos de la entidad no respetan namespace u orden alfabetico.
+      Revisar la seccion "IMPORTANTE SOBRE LOS CUERPOS XML".
+
+3) HTTP 400 / no conecta
+   -> El servicio no esta corriendo o se uso otro puerto.
+      Verificar que la app este levantada y que baseUrl apunte al puerto
+      mostrado en consola (perfil http = 5057).
+
+4) Address already in use al iniciar la app
+   -> Ya hay otra instancia ejecutandose en el puerto 5057. Cerrarla primero.

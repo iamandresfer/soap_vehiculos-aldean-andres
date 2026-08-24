@@ -1,0 +1,20 @@
+## Build results
+[Bb]in/
+[Oo]bj/
+
+## Visual Studio cache/options
+.vs/
+*.user
+*.suo
+*.userosscache
+
+## Logs
+[Ll]ogs/
+*.log
+
+## Test results
+[Tt]est[Rr]esult*/
+TestResults/
+
+## Publish output
+publish/
