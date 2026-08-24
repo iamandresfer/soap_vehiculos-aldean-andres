@@ -90,7 +90,8 @@ async function editarVehiculo(id) {
   try {
     const v = await ObtenerVehiculo(id);
     if (!v) {
-      mostrarMensaje('No existe el vehiculo con id ' + id, true);
+      mostrarMensaje('El vehiculo ' + id + ' ya no existe en la base. Tabla recargada.', true);
+      await cargarVehiculos();
       return;
     }
     document.getElementById('campoIdVehiculo').value = v.IdVehiculo;
@@ -113,7 +114,11 @@ async function eliminarVehiculo(id) {
   if (!confirm('Eliminar el vehiculo con id ' + id + '?')) return;
   try {
     const ok = await EliminarVehiculo(id);
-    mostrarMensaje(ok ? 'Vehiculo eliminado' : 'No se encontro el id ' + id, !ok);
+    if (!ok) {
+      mostrarMensaje('El vehiculo ' + id + ' ya no existe. Tabla recargada.', true);
+    } else {
+      mostrarMensaje('Vehiculo eliminado', false);
+    }
     await cargarVehiculos();
   } catch (e) {
     mostrarMensaje('Error al eliminar: ' + e.message, true);
@@ -134,7 +139,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       if (v.IdVehiculo > 0) {
         const actualizado = await ActualizarVehiculo(v);
-        mostrarMensaje(actualizado ? 'Vehiculo actualizado' : 'No se encontro el id', !actualizado);
+        if (!actualizado) {
+          mostrarMensaje('El vehiculo ' + v.IdVehiculo + ' ya no existe. Tabla recargada.', true);
+          limpiarForma();
+        } else {
+          mostrarMensaje('Vehiculo actualizado', false);
+          limpiarForma();
+        }
       } else {
         const creado = await AgregarVehiculo(v);
         mostrarMensaje('Vehiculo agregado con id ' + creado.IdVehiculo, false);

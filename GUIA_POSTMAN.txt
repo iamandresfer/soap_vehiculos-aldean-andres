@@ -193,3 +193,9 @@ Sin body ni headers especiales. Debe devolver el XML del WSDL.
 
 4) Address already in use al iniciar la app
    -> Ya hay otra instancia ejecutandose en el puerto 5057. Cerrarla primero.
+
+5) En SSMS veo otros ids distintos a los de la aplicacion
+   -> Te conectaste a una instancia LocalDB diferente (ej. LOCALDB#xxxx,
+      instancia automatica creada por SSMS). La aplicacion usa SIEMPRE:
+      (localdb)\MSSQLLocalDB
+      Conectate a ese servidor en SSMS para ver la misma base de datos.

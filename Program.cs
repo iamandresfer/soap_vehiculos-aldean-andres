@@ -35,7 +35,11 @@ builder.WebHost.ConfigureKestrel(options =>
 var app = builder.Build();
 
 app.UseDefaultFiles();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+        ctx.Context.Response.Headers["Cache-Control"] = "no-cache"
+});
 
 app.UseServiceModel(serviceBuilder =>
 {
