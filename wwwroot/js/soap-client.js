@@ -52,6 +52,16 @@ function etiquetas(el, nombre) {
   return [...(el ? el.getElementsByTagNameNS('*', nombre) : [])];
 }
 
+function entidadUnica(doc, operacion) {
+  const res = resultado(doc, operacion);
+  if (!res) return null;
+
+  const envueltos = etiquetas(res, 'Vehiculo');
+  if (envueltos.length) return parseVehiculo(envueltos[0]);
+
+  return res.childElementCount > 0 ? parseVehiculo(res) : null;
+}
+
 function hijo(el, nombre) {
   if (!el) return null;
   for (const nodo of el.children) {
@@ -99,8 +109,7 @@ async function ObtenerVehiculos() {
 async function ObtenerVehiculo(id) {
   const cuerpo = '<ObtenerVehiculo xmlns="' + NS + '"><id>' + id + '</id></ObtenerVehiculo>';
   const doc = await llamarSoap('ObtenerVehiculo', cuerpo);
-  const nodos = etiquetas(resultado(doc, 'ObtenerVehiculo'), 'Vehiculo');
-  return nodos.length ? parseVehiculo(nodos[0]) : null;
+  return entidadUnica(doc, 'ObtenerVehiculo');
 }
 
 async function AgregarVehiculo(v) {
@@ -117,7 +126,7 @@ async function AgregarVehiculo(v) {
       '</vehiculo>' +
     '</AgregarVehiculo>';
   const doc = await llamarSoap('AgregarVehiculo', cuerpo);
-  return parseVehiculo(etiquetas(resultado(doc, 'AgregarVehiculo'), 'Vehiculo')[0]);
+  return entidadUnica(doc, 'AgregarVehiculo');
 }
 
 async function ActualizarVehiculo(v) {
@@ -134,8 +143,7 @@ async function ActualizarVehiculo(v) {
       '</vehiculo>' +
     '</ActualizarVehiculo>';
   const doc = await llamarSoap('ActualizarVehiculo', cuerpo);
-  const nodos = etiquetas(resultado(doc, 'ActualizarVehiculo'), 'Vehiculo');
-  return nodos.length ? parseVehiculo(nodos[0]) : null;
+  return entidadUnica(doc, 'ActualizarVehiculo');
 }
 
 async function EliminarVehiculo(id) {
